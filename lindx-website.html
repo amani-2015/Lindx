@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en" id="htmlRoot">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LINDX — A Hardened, Gaming-Ready Linux Distribution</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0d12;
+    --bg-panel:#10141b;
+    --bg-panel-2:#161b24;
+    --border:#232a35;
+    --amber:#e8a33d;
+    --amber-bright:#ffcf7a;
+    --cyan:#5fd4d0;
+    --text:#e7e9ee;
+    --text-dim:#8b93a1;
+    --warn:#e8a33d;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', sans-serif;
+    --arsans: 'Tajawal', sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.6;
+    overflow-x:hidden;
+    background-image:
+      linear-gradient(rgba(232,163,61,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,163,61,0.035) 1px, transparent 1px);
+    background-size: 42px 42px;
+  }
+  body[dir="rtl"]{font-family:var(--arsans);}
+  body[dir="rtl"] .mono{font-family:var(--mono);direction:ltr;unicode-bidi:embed;}
+
+  ::selection{background:var(--amber);color:#0a0d12;}
+
+  a{color:inherit;text-decoration:none;}
+  .mono{font-family:var(--mono);}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 28px;}
+
+  /* ---------- NAV ---------- */
+  header{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    background:rgba(10,13,18,0.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  nav.wrap{
+    display:flex;align-items:center;justify-content:space-between;
+    height:68px;
+  }
+  .logo{
+    font-family:var(--mono);font-weight:800;font-size:1.15rem;letter-spacing:0.06em;
+    color:var(--text);display:flex;align-items:center;gap:8px;
+  }
+  .logo .dot{width:8px;height:8px;border-radius:50%;background:var(--amber);
+    box-shadow:0 0 8px var(--amber),0 0 16px var(--amber);
+    animation:pulse 2.2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.35;}}
+
+  .navlinks{display:flex;gap:32px;font-size:0.92rem;color:var(--text-dim);}
+  .navlinks a{transition:color .2s;}
+  .navlinks a:hover{color:var(--amber-bright);}
+  @media (max-width:820px){.navlinks{display:none;}}
+
+  /* hamburger / language switcher */
+  .langbtn{
+    background:none;border:1px solid var(--border);border-radius:6px;
+    width:42px;height:42px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:5px;cursor:pointer;position:relative;
+  }
+  .langbtn span{display:block;width:20px;height:2px;background:var(--text);transition:all .3s ease;}
+  .langbtn.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+  .langbtn.open span:nth-child(2){opacity:0;}
+  .langbtn.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+  .langmenu{
+    position:absolute;top:60px;inset-inline-end:28px;
+    background:var(--bg-panel);border:1px solid var(--border);border-radius:10px;
+    min-width:230px;overflow:hidden;
+    box-shadow:0 20px 50px rgba(0,0,0,0.5);
+    opacity:0;transform:translateY(-10px) scale(0.98);pointer-events:none;
+    transition:all .25s ease;
+  }
+  .langmenu.show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto;}
+  .langmenu .group-label{
+    font-family:var(--mono);font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;
+    color:var(--text-dim);padding:12px 16px 6px;
+  }
+  .langmenu button{
+    width:100%;text-align:start;padding:10px 16px;background:none;border:none;color:var(--text);
+    font-size:0.92rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;
+    opacity:0;transform:translateX(-8px);animation:slideIn .3s ease forwards;
+  }
+  body[dir="rtl"] .langmenu button{transform:translateX(8px);}
+  .langmenu.show button{animation-play-state:running;}
+  .langmenu button:hover{background:var(--bg-panel-2);color:var(--amber-bright);}
+  .langmenu button small{color:var(--text-dim);font-family:var(--mono);font-size:0.75rem;}
+  @keyframes slideIn{to{opacity:1;transform:translateX(0);}}
+  .langmenu button:nth-child(2){animation-delay:.03s;}
+  .langmenu button:nth-child(3){animation-delay:.06s;}
+  .langmenu button:nth-child(5){animation-delay:.09s;}
+  .langmenu button:nth-child(6){animation-delay:.12s;}
+  .langmenu button:nth-child(7){animation-delay:.15s;}
+  .langmenu button:nth-child(8){animation-delay:.18s;}
+  .divider{height:1px;background:var(--border);margin:6px 0;}
+
+  /* ---------- HERO / TERMINAL ---------- */
+  .hero{
+    min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+    padding-top:100px;padding-bottom:60px;position:relative;
+  }
+  .hero::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px);
+  }
+  .terminal{
+    background:var(--bg-panel);border:1px solid var(--border);border-radius:12px;
+    max-width:720px;margin-bottom:36px;overflow:hidden;
+    box-shadow:0 30px 80px rgba(0,0,0,0.55);
+  }
+  .term-bar{
+    display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg-panel-2);
+    border-bottom:1px solid var(--border);
+  }
+  .term-bar span{width:10px;height:10px;border-radius:50%;display:block;}
+  .term-bar span:nth-child(1){background:#e8676a;}
+  .term-bar span:nth-child(2){background:#e8c23d;}
+  .term-bar span:nth-child(3){background:#4fd67f;}
+  .term-title{margin-inline-start:8px;font-family:var(--mono);font-size:0.75rem;color:var(--text-dim);}
+  .term-body{padding:18px 20px;font-family:var(--mono);font-size:0.86rem;min-height:170px;}
+  .term-line{color:var(--text-dim);white-space:pre-wrap;opacity:0;}
+  .term-line.shown{opacity:1;}
+  .term-line .ts{color:var(--cyan);}
+  .term-line.ok{color:var(--amber-bright);}
+  .cursor{display:inline-block;width:8px;height:15px;background:var(--amber);vertical-align:middle;animation:blink 1s step-start infinite;}
+  @keyframes blink{50%{opacity:0;}}
+
+  .hero-title{
+    font-family:var(--mono);font-weight:800;font-size:clamp(2.6rem,7vw,4.4rem);
+    letter-spacing:0.01em;line-height:1;color:var(--text);
+    opacity:0;transform:translateY(14px);
+  }
+  .hero-title.reveal{animation:riseIn .6s ease forwards;}
+  .hero-title .accent{color:var(--amber);}
+  @keyframes riseIn{to{opacity:1;transform:translateY(0);}}
+
+  .hero-sub{
+    max-width:620px;color:var(--text-dim);font-size:1.08rem;margin-top:18px;
+    opacity:0;transform:translateY(14px);
+  }
+  .hero-sub.reveal{animation:riseIn .6s ease .15s forwards;}
+
+  .hero-ctas{display:flex;gap:16px;margin-top:32px;flex-wrap:wrap;
+    opacity:0;transform:translateY(14px);}
+  .hero-ctas.reveal{animation:riseIn .6s ease .3s forwards;}
+
+  .btn{
+    font-family:var(--mono);font-weight:600;font-size:0.9rem;padding:13px 26px;border-radius:8px;
+    display:inline-flex;align-items:center;gap:10px;cursor:pointer;transition:all .2s;border:1px solid transparent;
+  }
+  .btn-primary{background:var(--amber);color:#0a0d12;}
+  .btn-primary:hover{background:var(--amber-bright);transform:translateY(-2px);box-shadow:0 8px 24px rgba(232,163,61,0.35);}
+  .btn-ghost{border-color:var(--border);color:var(--text);}
+  .btn-ghost:hover{border-color:var(--cyan);color:var(--cyan);transform:translateY(-2px);}
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:110px 0;position:relative;}
+  .eyebrow{
+    font-family:var(--mono);font-size:0.78rem;letter-spacing:0.14em;text-transform:uppercase;
+    color:var(--cyan);margin-bottom:14px;display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:"";width:24px;height:1px;background:var(--cyan);}
+  h2{font-family:var(--mono);font-weight:800;font-size:clamp(1.8rem,4vw,2.6rem);margin-bottom:22px;}
+  .lead{color:var(--text-dim);font-size:1.05rem;max-width:680px;margin-bottom:20px;}
+
+  .reveal-up{opacity:0;transform:translateY(24px);transition:all .7s cubic-bezier(.2,.7,.3,1);}
+  .reveal-up.visible{opacity:1;transform:translateY(0);}
+
+  /* about */
+  .about-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:50px;align-items:start;}
+  @media (max-width:800px){.about-grid{grid-template-columns:1fr;}}
+  .kernel-card{
+    background:var(--bg-panel);border:1px solid var(--border);border-radius:12px;padding:26px;
+    font-family:var(--mono);font-size:0.85rem;
+  }
+  .kernel-card .row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);color:var(--text-dim);}
+  .kernel-card .row:last-child{border-bottom:none;}
+  .kernel-card .row b{color:var(--amber-bright);font-weight:600;}
+
+  /* features */
+  .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  @media (max-width:900px){.feat-grid{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:560px){.feat-grid{grid-template-columns:1fr;}}
+  .feat-card{
+    background:var(--bg-panel);border:1px solid var(--border);border-radius:12px;padding:24px;
+    transition:all .3s ease;position:relative;overflow:hidden;
+  }
+  .feat-card::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,var(--amber),var(--cyan));
+    transform:scaleX(0);transform-origin:left;transition:transform .35s ease;
+  }
+  .feat-card:hover{border-color:var(--amber);transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,0.4);}
+  .feat-card:hover::before{transform:scaleX(1);}
+  .feat-icon{font-family:var(--mono);font-size:0.75rem;color:var(--cyan);margin-bottom:14px;letter-spacing:0.1em;}
+  .feat-card h3{font-family:var(--mono);font-size:1.02rem;margin-bottom:10px;}
+  .feat-card p{color:var(--text-dim);font-size:0.92rem;}
+
+  /* download */
+  .download-note{
+    display:flex;gap:14px;align-items:flex-start;background:rgba(232,163,61,0.08);
+    border:1px solid rgba(232,163,61,0.4);border-radius:10px;padding:16px 18px;margin-bottom:32px;
+    font-family:var(--mono);font-size:0.85rem;color:var(--amber-bright);
+  }
+  .download-note .mark{font-size:1.1rem;line-height:1;}
+  .dl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;}
+  .dl-card{
+    background:var(--bg-panel);border:1px solid var(--border);border-radius:12px;padding:22px;
+    transition:all .25s ease;
+  }
+  .dl-card:hover{border-color:var(--cyan);box-shadow:0 14px 34px rgba(95,212,208,0.12);}
+  .dl-card .ver{font-family:var(--mono);color:var(--amber-bright);font-size:1.15rem;font-weight:700;}
+  .dl-card .tag{font-family:var(--mono);font-size:0.7rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.08em;display:block;margin-top:4px;margin-bottom:14px;}
+  .dl-card a.get{
+    display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:0.85rem;
+    color:var(--bg);background:var(--cyan);padding:9px 16px;border-radius:7px;font-weight:600;transition:.2s;
+  }
+  .dl-card a.get:hover{background:#8fe6e2;}
+
+  /* build */
+  .tools-list{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0 30px;}
+  .tool-chip{
+    font-family:var(--mono);font-size:0.82rem;background:var(--bg-panel-2);border:1px solid var(--border);
+    padding:7px 13px;border-radius:20px;color:var(--text-dim);
+  }
+  pre{
+    background:var(--bg-panel);border:1px solid var(--border);border-radius:10px;padding:20px;
+    overflow-x:auto;font-family:var(--mono);font-size:0.84rem;color:var(--text);margin:18px 0;
+    direction:ltr;text-align:left;
+  }
+  pre .cmt{color:var(--text-dim);}
+  pre .cmd{color:var(--amber-bright);}
+  h4{font-family:var(--mono);font-size:1rem;margin-top:28px;margin-bottom:8px;color:var(--cyan);}
+
+  /* license */
+  .license-box{
+    background:var(--bg-panel);border:1px solid var(--border);border-radius:12px;padding:30px;
+    display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;
+  }
+  .gpl-mark{
+    font-family:var(--mono);font-weight:800;font-size:1.4rem;border:2px solid var(--amber);color:var(--amber);
+    padding:10px 16px;border-radius:8px;flex-shrink:0;
+  }
+
+  footer{
+    border-top:1px solid var(--border);padding:36px 0;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+    color:var(--text-dim);font-size:0.85rem;font-family:var(--mono);
+  }
+
+  .deco-script{font-size:0.78rem;color:var(--text-dim);margin-top:6px;font-style:italic;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important;transition-duration:0.001ms !important;}
+  }
+</style>
+</head>
+<body dir="ltr">
+
+<header>
+  <nav class="wrap">
+    <div class="logo"><span class="dot"></span>LINDX</div>
+    <div class="navlinks">
+      <a href="#about" data-i18n="nav_about">About</a>
+      <a href="#features" data-i18n="nav_features">Features</a>
+      <a href="#download" data-i18n="nav_download">Download</a>
+      <a href="#build" data-i18n="nav_build">Build</a>
+      <a href="#license" data-i18n="nav_license">License</a>
+    </div>
+    <div style="position:relative;">
+      <button class="langbtn" id="langBtn" aria-label="Menu / اللغة"><span></span><span></span><span></span></button>
+      <div class="langmenu" id="langMenu">
+        <div class="group-label">Language</div>
+        <button data-lang="en">English <small>EN</small></button>
+        <button data-lang="ar">العربية <small>AR</small></button>
+        <div class="divider"></div>
+        <div class="group-label">Decorative scripts</div>
+        <button data-lang="sux">𒅴𒂠 Sumerian <small>cuneiform</small></button>
+        <button data-lang="akk">𒀝𒅗𒁺 Akkadian / Babylonian <small>cuneiform</small></button>
+        <button data-lang="assy">𒀸𒋩 Assyrian <small>cuneiform</small></button>
+        <button data-lang="egy">𓂀𓏏𓊖 Egyptian <small>hieroglyphic</small></button>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<section class="hero wrap">
+  <div class="terminal">
+    <div class="term-bar">
+      <span></span><span></span><span></span>
+      <span class="term-title">root@lindx — boot log</span>
+    </div>
+    <div class="term-body" id="termBody"></div>
+  </div>
+
+  <h1 class="hero-title" id="heroTitle">LIND<span class="accent">X</span></h1>
+  <p class="hero-sub" id="heroSub" data-i18n="hero_sub">A hardened, gaming-ready Linux distribution built on Ubuntu LTS, powered by the custom Xamnod kernel.</p>
+  <div class="hero-ctas" id="heroCtas">
+    <a href="#download" class="btn btn-primary" data-i18n="hero_cta1">↓ Download LINDX</a>
+    <a href="#build" class="btn btn-ghost" data-i18n="hero_cta2">Build Guide</a>
+  </div>
+</section>
+
+<section id="about" class="wrap">
+  <div class="reveal-up">
+    <div class="eyebrow" data-i18n="about_eyebrow">About the project</div>
+    <div class="about-grid">
+      <div>
+        <h2 data-i18n="about_title">What is LINDX?</h2>
+        <p class="lead" data-i18n="about_p1">LINDX is an independent Linux distribution built on Ubuntu LTS foundations, with the stock kernel replaced by Xamnod — a custom kernel tuned for responsiveness, security, and gaming workloads.</p>
+        <p class="lead" data-i18n="about_p2">The desktop runs XFCE: kept fast and configurable rather than heavy. LINDX ships with hardened defaults out of the box, so you're not left assembling a secure system after install.</p>
+      </div>
+      <div class="kernel-card mono">
+        <div class="row"><span data-i18n="k_kernel">Kernel</span><b>Xamnod</b></div>
+        <div class="row"><span data-i18n="k_base">Base</span><b>Ubuntu LTS</b></div>
+        <div class="row"><span data-i18n="k_desktop">Desktop</span><b>XFCE</b></div>
+        <div class="row"><span data-i18n="k_focus">Focus</span><b><span data-i18n="k_focus_val">Security · Gaming</span></b></div>
+        <div class="row"><span data-i18n="k_license">License</span><b>GPLv3</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features" class="wrap">
+  <div class="reveal-up">
+    <div class="eyebrow" data-i18n="feat_eyebrow">Under the hood</div>
+    <h2 data-i18n="feat_title">Built for speed, locked down by default</h2>
+  </div>
+  <div class="feat-grid" id="featGrid">
+    <div class="feat-card reveal-up">
+      <div class="feat-icon">01 · KERNEL</div>
+      <h3 data-i18n="f1_t">Xamnod Kernel</h3>
+      <p data-i18n="f1_p">A custom-built kernel tuned for gaming and low-latency response.</p>
+    </div>
+    <div class="feat-card reveal-up">
+      <div class="feat-icon">02 · DESKTOP</div>
+      <h3 data-i18n="f2_t">XFCE Desktop</h3>
+      <p data-i18n="f2_p">Lightweight, fast, and fully configurable — no bloat by default.</p>
+    </div>
+    <div class="feat-card reveal-up">
+      <div class="feat-icon">03 · SECURITY</div>
+      <h3 data-i18n="f3_t">Security Hardening</h3>
+      <p data-i18n="f3_p">Sane, hardened defaults active from the very first boot.</p>
+    </div>
+    <div class="feat-card reveal-up">
+      <div class="feat-icon">04 · GAMING</div>
+      <h3 data-i18n="f4_t">Gaming Optimizations</h3>
+      <p data-i18n="f4_p">Scheduler tweaks and low-latency I/O for a smoother gaming session.</p>
+    </div>
+    <div class="feat-card reveal-up">
+      <div class="feat-icon">05 · BASE</div>
+      <h3 data-i18n="f5_t">Ubuntu LTS Base</h3>
+      <p data-i18n="f5_p">Long-term stability with the familiar apt package ecosystem.</p>
+    </div>
+    <div class="feat-card reveal-up">
+      <div class="feat-icon">06 · LICENSE</div>
+      <h3 data-i18n="f6_t">Fully Open Source</h3>
+      <p data-i18n="f6_p">Released under GPLv3 — the full source is available on GitHub.</p>
+    </div>
+  </div>
+</section>
+
+<section id="download" class="wrap">
+  <div class="reveal-up">
+    <div class="eyebrow" data-i18n="dl_eyebrow">Get it</div>
+    <h2 data-i18n="dl_title">Download LINDX</h2>
+    <p class="lead" data-i18n="dl_lead">Free to download, free to modify, free to redistribute.</p>
+
+    <div class="download-note">
+      <span class="mark">⚠</span>
+      <span data-i18n="dl_note">All versions below v3.1 are code-only releases without a working build.</span>
+    </div>
+
+    <!-- ============================================================
+         DOWNLOAD LINKS: replace the href="#" values below with your
+         actual MEGA / GitHub Releases links.
+         ============================================================ -->
+    <div class="dl-grid">
+      <div class="dl-card">
+        <span class="ver">v3.1</span>
+        <span class="tag" data-i18n="dl_latest">Latest · Working build</span>
+        <a class="get" href="https://mega.nz/file/DOQAyLDR#vFQu8C1p2TaV_JDzNnfe-4AdzvjE3UpkyLEDBo8SpsQ" data-i18n="dl_btn">↓ Download ISO</a>
+      </div>
+      <div class="dl-card">
+        <span class="ver">v3.0</span>
+        <span class="tag" data-i18n="dl_code_only">Code only</span>
+        <a class="get" href="https://github.com/amani-2015/Lindx" data-i18n="dl_btn_src">View Source</a>
+      </div>
+      <div class="dl-card">
+        <span class="ver">v2.x</span>
+        <span class="tag" data-i18n="dl_code_only">Code only</span>
+        <a class="get" href="https://mega.nz/file/ibgAlSbJ#Yo7eUBpe-UhhVtNRfxI1h7IAZWZ_Ib8FtNQ5HfkCDWE" data-i18n="dl_btn_src">View Source</a>
+      </div>
+      <div class="dl-card">
+        <span class="ver">v1.0</span>
+        <span class="tag">Early release</span>
+        <a class="get" href="https://mega.nz/file/3egAWaBT#Vxn8aRbGF07UUtXNswkhJP4qQmz9oxywRMs4xiISXBk">↓ Download ISO</a>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+  </div>
+</section>
+
+<section id="build" class="wrap">
+  <div class="reveal-up">
+    <div class="eyebrow" data-i18n="build_eyebrow">For developers</div>
+    <h2 data-i18n="build_title">Build LINDX From Source</h2>
+    <p class="lead" data-i18n="build_lead">Extract an existing ISO, or build LINDX from scratch using the automated build script.</p>
+
+    <h4 data-i18n="build_tools_h">Required tools</h4>
+    <div class="tools-list">
+      <span class="tool-chip">squashfs-tools</span>
+      <span class="tool-chip">xorriso</span>
+      <span class="tool-chip">grub-pc-bin</span>
+      <span class="tool-chip">grub-efi-amd64-bin</span>
+      <span class="tool-chip">mtools</span>
+      <span class="tool-chip">live-boot</span>
+      <span class="tool-chip">casper</span>
+      <span class="tool-chip">git</span>
+    </div>
+
+    <h4 data-i18n="build_extract_h">Extracting files from an ISO</h4>
+    <pre class="mono"><span class="cmt"># mount the ISO and unpack the root filesystem</span>
+<span class="cmd">mkdir</span> -p /tmp/iso-mount
+<span class="cmd">sudo mount</span> -o loop LINDX-v3.iso /tmp/iso-mount
+
+<span class="cmd">sudo unsquashfs</span> -d squashfs-root /tmp/iso-mount/live/filesystem.squashfs
+<span class="cmd">sudo umount</span> /tmp/iso-mount</pre>
+
+    <h4 data-i18n="build_cmd_h">Building the ISO</h4>
+    <pre class="mono"><span class="cmt"># chroot into the extracted filesystem and customize it</span>
+<span class="cmd">sudo mount</span> --bind /dev squashfs-root/dev
+<span class="cmd">sudo mount</span> --bind /proc squashfs-root/proc
+<span class="cmd">sudo mount</span> --bind /sys squashfs-root/sys
+<span class="cmd">sudo chroot</span> squashfs-root /bin/bash
+
+<span class="cmt"># inside the chroot: install live-boot, casper, XFCE + LightDM,</span>
+<span class="cmt"># rebuild initramfs, create the lindx user, then exit chroot</span>
+
+<span class="cmt"># unmount, then repack the filesystem</span>
+<span class="cmd">sudo umount</span> -l squashfs-root/dev squashfs-root/proc squashfs-root/sys
+
+<span class="cmd">sudo mksquashfs</span> squashfs-root iso-build/live/filesystem.squashfs -comp xz -e boot -noappend
+
+<span class="cmt"># assemble the final bootable ISO with GRUB</span>
+<span class="cmd">grub-mkrescue</span> -o LINDX-v3.1.iso iso-build --volid LINDX_V3_1 --product-name LINDX --product-version 3.1</pre>
+    <p class="lead" style="font-size:0.9rem;" data-i18n="build_note">The full process — including kernel detection, initramfs rebuild, XFCE + LightDM setup, and GRUB config generation — is automated in <code class="mono">build-lindx.sh</code> in the repository.</p>
+  </div>
+</section>
+
+<section id="license" class="wrap">
+  <div class="reveal-up">
+    <div class="eyebrow" data-i18n="lic_eyebrow">Legal</div>
+    <h2 data-i18n="lic_title">License</h2>
+    <div class="license-box">
+      <div class="gpl-mark">GPL v3</div>
+      <p class="lead" style="margin:0;" data-i18n="lic_body">LINDX is released under the GNU General Public License v3.0. You're free to use, study, modify, and redistribute LINDX and its source, provided derivative works remain under the same license.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="wrap">
+  <div>LINDX © <span id="year"></span> — <span data-i18n="footer_note">built independently, released free.</span></div>
+  <div><a href="https://github.com/amani-2015/Lindx" data-i18n="footer_gh">Source on GitHub →</a></div>
+</footer>
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+
+/* ---------------- i18n ---------------- */
+const translations = {
+  en: {
+    nav_about:"About", nav_features:"Features", nav_download:"Download", nav_build:"Build", nav_license:"License",
+    hero_sub:"A hardened, gaming-ready Linux distribution built on Ubuntu LTS, powered by the custom Xamnod kernel.",
+    hero_cta1:"↓ Download LINDX", hero_cta2:"Build Guide",
+    about_eyebrow:"About the project", about_title:"What is LINDX?",
+    about_p1:"LINDX is an independent Linux distribution built on Ubuntu LTS foundations, with the stock kernel replaced by Xamnod — a custom kernel tuned for responsiveness, security, and gaming workloads.",
+    about_p2:"The desktop runs XFCE: kept fast and configurable rather than heavy. LINDX ships with hardened defaults out of the box, so you're not left assembling a secure system after install.",
+    k_kernel:"Kernel", k_base:"Base", k_desktop:"Desktop", k_focus:"Focus", k_focus_val:"Security · Gaming", k_license:"License",
+    feat_eyebrow:"Under the hood", feat_title:"Built for speed, locked down by default",
+    f1_t:"Xamnod Kernel", f1_p:"A custom-built kernel tuned for gaming and low-latency response.",
+    f2_t:"XFCE Desktop", f2_p:"Lightweight, fast, and fully configurable — no bloat by default.",
+    f3_t:"Security Hardening", f3_p:"Sane, hardened defaults active from the very first boot.",
+    f4_t:"Gaming Optimizations", f4_p:"Scheduler tweaks and low-latency I/O for a smoother gaming session.",
+    f5_t:"Ubuntu LTS Base", f5_p:"Long-term stability with the familiar apt package ecosystem.",
+    f6_t:"Fully Open Source", f6_p:"Released under GPLv3 — the full source is available on GitHub.",
+    dl_eyebrow:"Get it", dl_title:"Download LINDX", dl_lead:"Free to download, free to modify, free to redistribute.",
+    dl_note:"All versions below v3.1 are code-only releases without a working build.",
+    dl_latest:"Latest · Working build", dl_code_only:"Code only", dl_btn:"↓ Download ISO", dl_btn_src:"View Source",
+    build_eyebrow:"For developers", build_title:"Build LINDX From Source",
+    build_lead:"Extract an existing ISO, or build LINDX from scratch using the automated build script.",
+    build_tools_h:"Required tools", build_extract_h:"Extracting files from an ISO", build_cmd_h:"Building the ISO",
+    build_note:"The script handles debootstrap, kernel packaging, XFCE + LightDM setup, squashfs compression, and final ISO assembly.",
+    lic_eyebrow:"Legal", lic_title:"License",
+    lic_body:"LINDX is released under the GNU General Public License v3.0. You're free to use, study, modify, and redistribute LINDX and its source, provided derivative works remain under the same license.",
+    footer_note:"built independently, released free.", footer_gh:"Source on GitHub →"
+  },
+  ar: {
+    nav_about:"حول", nav_features:"المزايا", nav_download:"التحميل", nav_build:"البناء", nav_license:"الرخصة",
+    hero_sub:"توزيعة لينكس مُحصّنة وجاهزة للألعاب، مبنية على أوبونتو LTS، وتعمل بنواة Xamnod المخصصة.",
+    hero_cta1:"↓ تحميل LINDX", hero_cta2:"دليل البناء",
+    about_eyebrow:"حول المشروع", about_title:"ما هو LINDX؟",
+    about_p1:"LINDX توزيعة لينكس مستقلة مبنية على أساس أوبونتو LTS، مع استبدال النواة الافتراضية بنواة Xamnod المخصصة، المُحسّنة للاستجابة والأمان والألعاب.",
+    about_p2:"تعمل سطح المكتب XFCE سريعاً وقابلاً للتخصيص دون أن يكون ثقيلاً. يأتي LINDX بإعدادات تحصين افتراضية منذ الإقلاع الأول، فلا تحتاج لبناء نظام آمن بنفسك بعد التثبيت.",
+    k_kernel:"النواة", k_base:"الأساس", k_desktop:"سطح المكتب", k_focus:"التركيز", k_focus_val:"الأمان · الألعاب", k_license:"الرخصة",
+    feat_eyebrow:"تحت الغطاء", feat_title:"مبني للسرعة، ومُحصّن افتراضياً",
+    f1_t:"نواة Xamnod", f1_p:"نواة مخصصة مُحسّنة للألعاب وزمن الاستجابة المنخفض.",
+    f2_t:"سطح مكتب XFCE", f2_p:"خفيف وسريع وقابل للتخصيص بالكامل، دون أي إثقال افتراضي.",
+    f3_t:"تحصين أمني", f3_p:"إعدادات افتراضية آمنة وفعّالة منذ أول إقلاع.",
+    f4_t:"تحسينات الألعاب", f4_p:"تعديلات في المجدول ومداخل/مخارج منخفضة التأخير لتجربة ألعاب أكثر سلاسة.",
+    f5_t:"أساس أوبونتو LTS", f5_p:"استقرار طويل الأمد مع نظام حزم apt المألوف.",
+    f6_t:"مفتوح المصدر بالكامل", f6_p:"يُصدر تحت رخصة GPLv3 — الكود المصدري متاح بالكامل على GitHub.",
+    dl_eyebrow:"احصل عليه", dl_title:"تحميل LINDX", dl_lead:"مجاني للتحميل، مجاني للتعديل، مجاني لإعادة التوزيع.",
+    dl_note:"كل الإصدارات تحت v3.1 هي إصدارات كود فقط دون بناء عملي جاهز.",
+    dl_latest:"الأحدث · بناء يعمل", dl_code_only:"كود فقط", dl_btn:"↓ تحميل ISO", dl_btn_src:"عرض الكود",
+    build_eyebrow:"للمطورين", build_title:"بناء LINDX من المصدر",
+    build_lead:"استخرج ملفات ISO موجودة، أو ابنِ LINDX من الصفر باستخدام سكربت البناء الآلي.",
+    build_tools_h:"الأدوات المطلوبة", build_extract_h:"استخراج الملفات من داخل ISO", build_cmd_h:"بناء ملف ISO",
+    build_note:"يتكفّل السكربت بـ debootstrap، تجهيز النواة، إعداد XFCE و LightDM، ضغط squashfs، وتجميع ملف ISO النهائي.",
+    lic_eyebrow:"قانوني", lic_title:"الرخصة",
+    lic_body:"يُصدر LINDX تحت رخصة جنو العمومية العامة الإصدار 3 (GPLv3). يحق لك استخدام LINDX ودراسته وتعديله وإعادة توزيعه بحرية، شرط أن تبقى الأعمال المشتقة تحت الرخصة ذاتها.",
+    footer_note:"مبني بشكل مستقل، ومُتاح مجاناً.", footer_gh:"الكود على GitHub ←"
+  }
+};
+
+/* Decorative-only ancient scripts: hero title + subtitle rendered in
+   period scripts as a stylistic flourish. The rest of the page stays
+   in English underneath, since these aren't functional translations. */
+const decorative = {
+  sux:  { title:"𒇸𒅔𒁺𒀭",       note:"Sumerian cuneiform — decorative rendering, page content stays in English" },
+  akk:  { title:"𒀝𒅗𒁺𒌷",       note:"Akkadian / Babylonian cuneiform — decorative rendering, page content stays in English" },
+  assy: { title:"𒀸𒋩𒌷𒀭",       note:"Neo-Assyrian cuneiform — decorative rendering, page content stays in English" },
+  egy:  { title:"𓂀𓏏𓊖𓈖",       note:"Egyptian hieroglyphic — decorative rendering, page content stays in English" }
+};
+
+const htmlRoot = document.getElementById('htmlRoot');
+const body = document.body;
+const heroTitle = document.getElementById('heroTitle');
+let decoNoteEl = null;
+
+function applyLang(lang){
+  if(translations[lang]){
+    const t = translations[lang];
+    document.querySelectorAll('[data-i18n]').forEach(el=>{
+      const key = el.getAttribute('data-i18n');
+      if(t[key]) el.textContent = t[key];
+    });
+    body.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    htmlRoot.lang = lang;
+    heroTitle.innerHTML = 'LIND<span class="accent">X</span>';
+    if(decoNoteEl){ decoNoteEl.remove(); decoNoteEl = null; }
+  } else if(decorative[lang]){
+    // apply English content as the functional base, then overlay decorative title
+    const t = translations.en;
+    document.querySelectorAll('[data-i18n]').forEach(el=>{
+      const key = el.getAttribute('data-i18n');
+      if(t[key]) el.textContent = t[key];
+    });
+    body.dir = 'ltr';
+    htmlRoot.lang = 'en';
+    heroTitle.textContent = decorative[lang].title;
+    if(!decoNoteEl){
+      decoNoteEl = document.createElement('p');
+      decoNoteEl.className = 'deco-script';
+      heroTitle.insertAdjacentElement('afterend', decoNoteEl);
+    }
+    decoNoteEl.textContent = decorative[lang].note;
+  }
+}
+
+/* ---------------- language menu ---------------- */
+const langBtn = document.getElementById('langBtn');
+const langMenu = document.getElementById('langMenu');
+langBtn.addEventListener('click', ()=>{
+  langBtn.classList.toggle('open');
+  langMenu.classList.toggle('show');
+});
+document.addEventListener('click', (e)=>{
+  if(!langBtn.contains(e.target) && !langMenu.contains(e.target)){
+    langBtn.classList.remove('open');
+    langMenu.classList.remove('show');
+  }
+});
+langMenu.querySelectorAll('button[data-lang]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    applyLang(btn.getAttribute('data-lang'));
+    langBtn.classList.remove('open');
+    langMenu.classList.remove('show');
+  });
+});
+
+/* ---------------- terminal boot typewriter ---------------- */
+const bootLines = [
+  {ts:"0.000000", msg:"LINDX bootloader initializing..."},
+  {ts:"0.142031", msg:"Loading kernel: Xamnod 6.x-lindx"},
+  {ts:"0.481221", msg:"Mounting XFCE desktop environment..."},
+  {ts:"0.902104", msg:"Applying security hardening profiles..."},
+  {ts:"1.203981", msg:"Enabling gaming performance governors..."},
+  {ts:"1.512004", msg:"Welcome to LINDX.", ok:true}
+];
+const termBody = document.getElementById('termBody');
+
+function typeLine(lineObj, done){
+  const div = document.createElement('div');
+  div.className = 'term-line shown' + (lineObj.ok ? ' ok' : '');
+  termBody.appendChild(div);
+  const prefix = lineObj.ok ? "" : `[  <span class="ts">${lineObj.ts}</span>] `;
+  let full = prefix + lineObj.msg;
+  let i = 0;
+  const speed = 14;
+  function step(){
+    div.innerHTML = full.slice(0, i) + '<span class="cursor"></span>';
+    i++;
+    if(i <= full.length){
+      // careful increment against html tags: use plain text length approx
+      setTimeout(step, speed);
+    } else {
+      div.innerHTML = full;
+      done();
+    }
+  }
+  // simpler: type against text-only length using textContent measure
+  const plain = (lineObj.ok ? "" : `[  ${lineObj.ts}] `) + lineObj.msg;
+  let j = 0;
+  div.innerHTML = '';
+  function stepPlain(){
+    const shown = plain.slice(0, j);
+    div.innerHTML = (lineObj.ok ? '' : `[  <span class="ts">${lineObj.ts}</span>] `.length ? '' : '') ;
+    div.textContent = shown;
+    if(lineObj.ok) div.classList.add('ok');
+    j++;
+    if(j <= plain.length){
+      setTimeout(stepPlain, speed);
+    } else {
+      done();
+    }
+  }
+  stepPlain();
+}
+
+function runBoot(idx){
+  if(idx >= bootLines.length){
+    document.getElementById('heroTitle').classList.add('reveal');
+    document.getElementById('heroSub').classList.add('reveal');
+    document.getElementById('heroCtas').classList.add('reveal');
+    return;
+  }
+  typeLine(bootLines[idx], ()=> setTimeout(()=>runBoot(idx+1), 120));
+}
+window.addEventListener('load', ()=> setTimeout(()=>runBoot(0), 300));
+
+/* ---------------- scroll reveal ---------------- */
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('visible');
+      io.unobserve(e.target);
+    }
+  });
+},{threshold:0.15});
+document.querySelectorAll('.reveal-up').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
