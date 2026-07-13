@@ -27,12 +27,14 @@ LINDX is an independent Linux distribution built on Ubuntu LTS foundations, with
 
 Free to download, free to modify, free to redistribute.
 
+⚠ All versions below v3.1 are code-only releases without a working build.
+
 | Version | Status | Link |
 |---|---|---|
-| v3.1 | Latest · Working build | [Download ISO](#) |
-| v3.0 | Code only | [View Source](#) |
-| v2.x | Code only | [View Source](#) |
-| v1.0 | Early release | [Download ISO](#) |
+| v3.1 | Latest · Working build | [Download ISO](https://mega.nz/file/DOQAyLDR#vFQu8C1p2TaV_JDzNnfe-4AdzvjE3UpkyLEDBo8SpsQ) |
+| v3.0 | Code only | [View Source](https://github.com/amani-2015/Lindx) |
+| v2.x | Code only | [View Source](https://mega.nz/file/ibgAlSbJ#Yo7eUBpe-UhhVtNRfxI1h7IAZWZ_Ib8FtNQ5HfkCDWE) |
+| v1.0 | Early release | [Download ISO](https://mega.nz/file/3egAWaBT#Vxn8aRbGF07UUtXNswkhJP4qQmz9oxywRMs4xiISXBk) |
 
 ## Build from Source
 
