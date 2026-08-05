@@ -1,15 +1,15 @@
 # LINDX
 
-A hardened, gaming-ready Linux distribution built on Ubuntu LTS, powered by the custom **Xamnod** kernel.
+A hardened, gaming-ready Linux distribution built on debian, powered by the custom **Xamnod** kernel.
 
 ## About
 
-LINDX is an independent Linux distribution built on Ubuntu LTS foundations, with the stock kernel replaced by Xamnod — a custom kernel tuned for responsiveness, security, and gaming workloads. The desktop runs XFCE: fast and configurable rather than heavy. LINDX ships with hardened defaults out of the box, so you're not left assembling a secure system after install.
+LINDX is an independent Linux distribution built on debian  foundations, with the stock kernel replaced by Xamnod — a custom kernel tuned for responsiveness, security, and gaming workloads. The desktop runs XFCE: fast and configurable rather than heavy. LINDX ships with hardened defaults out of the box, so you're not left assembling a secure system after install.
 
 | | |
 |---|---|
 | **Kernel** | Xamnod |
-| **Base** | Ubuntu LTS |
+| **Base** | debian |
 | **Desktop** | XFCE |
 | **Focus** | Security · Gaming |
 | **License** | GPLv3 |
@@ -20,7 +20,7 @@ LINDX is an independent Linux distribution built on Ubuntu LTS foundations, with
 - **XFCE Desktop** — lightweight, fast, and fully configurable, no bloat by default
 - **Security Hardening** — sane, hardened defaults active from the very first boot
 - **Gaming Optimizations** — scheduler tweaks and low-latency I/O for smoother gaming
-- **Ubuntu LTS Base** — long-term stability with the familiar apt package ecosystem
+- **debian** — for speed 
 - **Fully Open Source** — released under GPLv3, full source available on GitHub
 
 ## Download
